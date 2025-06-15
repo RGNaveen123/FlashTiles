@@ -48,10 +48,7 @@ public class MemoryGameManager : MonoBehaviour
 
     void Start()
     {
-        //if (isGameRunning)
-        //    // Wait one frame to ensure AdaptiveGrid's Awake() is called
-        //    StartCoroutine(DelayedGridGeneration());
-        AudioManager.Instance.PlayBGM();
+        StartCoroutine(DelayedGridGeneration());
 
     }
 

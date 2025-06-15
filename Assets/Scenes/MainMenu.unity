@@ -402,7 +402,7 @@ GameObject:
   - component: {fileID: 619104422}
   - component: {fileID: 619104423}
   m_Layer: 0
-  m_Name: MainManager
+  m_Name: StartManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -435,7 +435,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a49c4b0d0648d2240a30c3aab8a43907, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GameManager: {fileID: 3945583575038299376, guid: 5050f91862faf2846ad17be6d6b02c05, type: 3}
 --- !u!1 &636902342
 GameObject:
   m_ObjectHideFlags: 0
@@ -470,7 +469,9 @@ MonoBehaviour:
   wrongSound: {fileID: 8300000, guid: 3756a9ce3d1e8124baaae57c80cd8749, type: 3}
   levelCompleteSound: {fileID: 8300000, guid: dfc7e5eb609bc544e85505de246ccae2, type: 3}
   levelFailSound: {fileID: 8300000, guid: e95098be6792da74e83c473fbd52a6d5, type: 3}
-  ButtonClickSound: {fileID: 8300000, guid: 4a90f07092b95204ea89aa9ec6060345, type: 3}
+  buttonClickSound: {fileID: 8300000, guid: 4a90f07092b95204ea89aa9ec6060345, type: 3}
+  bgmClip: {fileID: 8300000, guid: 7e9768d6f4e314548b36593a85fcd5d6, type: 3}
+  gameCompletedSound: {fileID: 8300000, guid: c3f0fbba35910d64f9f20829f037b2f3, type: 3}
 --- !u!4 &636902344
 Transform:
   m_ObjectHideFlags: 0
@@ -570,8 +571,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 619104423}
-        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: StartGame
+        m_TargetAssemblyTypeName: StartMenuManager, Assembly-CSharp
+        m_MethodName: OnPlayClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -910,8 +911,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 619104423}
-        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
-        m_MethodName: ExitGame
+        m_TargetAssemblyTypeName: StartMenuManager, Assembly-CSharp
+        m_MethodName: OnExitClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
