@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6753035733333733778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1690022304048128465}
+  - component: {fileID: 3945583575038299376}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1690022304048128465
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6753035733333733778}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 584.1034, y: 353.89194, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3945583575038299376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6753035733333733778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15b207c217b35554d84dd0eb825b75e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tilePrefab: {fileID: 8757432573175238843, guid: 7881391a3b9518746bbc6cd818b6d755, type: 3}
+  gridParent: {fileID: 0}
+  hiddenSprite: {fileID: 7294402857615121082, guid: 38db7e4bda36acc45bd2967ec78f243c, type: 3}
+  shownSprites:
+  - {fileID: 362592318914433213, guid: 92a606de9e70fea4f92ce2cd3ba4fd8c, type: 3}
+  currentLevel: 1
+  checkpointLevel: 1
+  maxLevel: 10
+  levelText: {fileID: 0}
+  livesText: {fileID: 0}
+  maxLives: 3
+  allowClick: 0
+  wrongSprite: {fileID: -7247010117872420444, guid: 857b7448450c473429bfeafcce48e03d, type: 3}
+  timePerLevel: 10
+  timerText: {fileID: 0}
+  timerUI: {fileID: 0}
+  timesUpPanel: {fileID: 0}
+  pauseMenuPanel: {fileID: 0}
+  gameOverPanel: {fileID: 0}
+  gameCompletedPanel: {fileID: 0}
+  pauseButton: {fileID: 0}
+  checkpointToastAnimator: {fileID: 0}
+  mainMenuPanel: {fileID: 0}
+  homeButton: {fileID: 0}
+  gridSize: 3
