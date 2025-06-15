@@ -7,6 +7,7 @@ public class ModeSelector : MonoBehaviour
     {
         AudioManager.Instance.PlayButtonSound();
         SceneManager.LoadScene("MemoryGameScene");
+        Time.timeScale = 1f;
     }
 
     public void BackToMainMenu()

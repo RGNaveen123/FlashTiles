@@ -384,11 +384,10 @@ public class MemoryGameManager : MonoBehaviour
     {
         AudioManager.Instance.PlayButtonSound();
         HideAllGamePanels();
-        mainMenuPanel.SetActive(true);
-
         isTimerRunning = false;
         gameIsPaused = false;
         allowClick = false;
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void RestartGame()
@@ -403,15 +402,6 @@ public class MemoryGameManager : MonoBehaviour
         // Load the game scene fresh
         SceneManager.LoadScene("MemoryGameScene");
         mainMenuPanel.SetActive(false);
-    }
-
-    public void StartGame()
-    {
-        AudioManager.Instance.PlayButtonSound();
-        mainMenuPanel.SetActive(false);
-        Time.timeScale = 1f;
-        StartCoroutine(DelayedGridGeneration()); // Add this line
-        pauseButton.SetActive(true);   
     }
 
     private void HideAllGamePanels()
