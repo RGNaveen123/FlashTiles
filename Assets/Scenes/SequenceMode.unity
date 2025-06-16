@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 729651234}
+  m_Material: {fileID: 1310855361}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -243,7 +243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 288482998}
+  m_Material: {fileID: 484779950}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -387,7 +387,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: RetryFromCheckpoint
         m_Mode: 1
@@ -512,48 +512,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 186452409}
   m_CullTransparentMesh: 1
---- !u!21 &288482998
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/IndependentRoundedCorners
-  m_Shader: {fileID: 4800000, guid: d3beb88e61f88ca4393acdefb005fa70, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _halfSize: {r: 261.2701, g: 227.1653, b: 0, a: 0}
-    - _r: {r: 40, g: 40, b: 40, a: 40}
-    - _rect2props: {r: 0.000030517578, g: -0.000030517578, b: 317.09174, a: 317.09174}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &311886235
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,7 +594,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: StartGame
         m_Mode: 1
@@ -749,7 +707,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: GoToHome
         m_Mode: 1
@@ -818,15 +776,15 @@ RectTransform:
   m_AnchoredPosition: {x: 20, y: -20}
   m_SizeDelta: {x: 104, y: 80}
   m_Pivot: {x: 0, y: 1}
---- !u!21 &363109208
+--- !u!21 &470442896
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/IndependentRoundedCorners
-  m_Shader: {fileID: 4800000, guid: d3beb88e61f88ca4393acdefb005fa70, type: 3}
+  m_Name: UI/RoundedCorners/RoundedCorners
+  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -855,9 +813,7 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 179.24165, g: 59.9132, b: 0, a: 0}
-    - _r: {r: 36.5, g: 35.6, b: 40, a: 40}
-    - _rect2props: {r: 0.2250061, g: 1.9749756, b: 142.06119, a: 142.3794}
+    - _WidthHeightRadius: {r: 1048, g: 494, b: 160, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!1 &481602174
@@ -942,7 +898,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: ExitGame
         m_Mode: 1
@@ -992,6 +948,48 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 481602174}
   m_CullTransparentMesh: 1
+--- !u!21 &484779950
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI/RoundedCorners/IndependentRoundedCorners
+  m_Shader: {fileID: 4800000, guid: d3beb88e61f88ca4393acdefb005fa70, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _halfSize: {r: 261.2701, g: 227.1653, b: 0, a: 0}
+    - _r: {r: 40, g: 40, b: 40, a: 40}
+    - _rect2props: {r: 0.000030517578, g: -0.000030517578, b: 317.09174, a: 317.09174}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1287,7 +1285,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: ExitGame
         m_Mode: 1
@@ -1419,7 +1417,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: ExitGame
         m_Mode: 1
@@ -1553,7 +1551,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &729651234
+--- !u!21 &754407825
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -1590,9 +1588,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _halfSize: {r: 300, g: 200, b: 0, a: 0}
-    - _r: {r: 37.27, g: 41.1, b: 45.1, a: 44.7}
-    - _rect2props: {r: -1.0574799, g: 2.8574677, b: 324.4312, a: 323.21854}
+    - _halfSize: {r: 139.95004, g: 43.8295, b: 0, a: 0}
+    - _r: {r: 28.52, g: 28.7, b: 40, a: 40}
+    - _rect2props: {r: -0.04499054, g: 5.694992, b: 105.72629, a: 105.66265}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!1 &796005038
@@ -1924,48 +1922,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!21 &950881033
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/IndependentRoundedCorners
-  m_Shader: {fileID: 4800000, guid: d3beb88e61f88ca4393acdefb005fa70, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _halfSize: {r: 139.95004, g: 43.8295, b: 0, a: 0}
-    - _r: {r: 28.52, g: 28.7, b: 40, a: 40}
-    - _rect2props: {r: -0.04499054, g: 5.694992, b: 105.72629, a: 105.66265}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &967457589
 GameObject:
   m_ObjectHideFlags: 0
@@ -2048,7 +2004,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: PauseGame
         m_Mode: 1
@@ -2287,7 +2243,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2044358931}
+  m_Material: {fileID: 470442896}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -2327,6 +2283,48 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 80
   image: {fileID: 1023657537}
+--- !u!21 &1310855361
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI/RoundedCorners/IndependentRoundedCorners
+  m_Shader: {fileID: 4800000, guid: d3beb88e61f88ca4393acdefb005fa70, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _halfSize: {r: 300, g: 200, b: 0, a: 0}
+    - _r: {r: 37.27, g: 41.1, b: 45.1, a: 44.7}
+    - _rect2props: {r: -1.0574799, g: 2.8574677, b: 324.4312, a: 323.21854}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &1445647030
 GameObject:
   m_ObjectHideFlags: 0
@@ -2598,7 +2596,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: RetryFromCheckpoint
         m_Mode: 1
@@ -2805,7 +2803,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: GoToHome
         m_Mode: 1
@@ -2939,7 +2937,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: RetryFromCheckpoint
         m_Mode: 1
@@ -2963,7 +2961,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 363109208}
+  m_Material: {fileID: 2077200449}
   m_Color: {r: 1, g: 0.73623705, b: 0.34905648, a: 0.42352942}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3100,7 +3098,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: RestartGame
         m_Mode: 1
@@ -3402,15 +3400,15 @@ MonoBehaviour:
   gridPanel: {fileID: 1994718569}
   columns: 3
   rows: 3
---- !u!21 &2044358931
+--- !u!21 &2077200449
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/RoundedCorners
-  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
+  m_Name: UI/RoundedCorners/IndependentRoundedCorners
+  m_Shader: {fileID: 4800000, guid: d3beb88e61f88ca4393acdefb005fa70, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -3439,7 +3437,9 @@ Material:
     - _StencilWriteMask: 255
     - _UseUIAlphaClip: 0
     m_Colors:
-    - _WidthHeightRadius: {r: 1048, g: 494, b: 160, a: 0}
+    - _halfSize: {r: 179.24165, g: 59.9132, b: 0, a: 0}
+    - _r: {r: 36.5, g: 35.6, b: 40, a: 40}
+    - _rect2props: {r: 0.2250061, g: 1.9749756, b: 142.06119, a: 142.3794}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!1 &2117340803
@@ -3525,7 +3525,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 7603627291644061552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MemoryGameManager, Assembly-CSharp
         m_MethodName: ResumeGame
         m_Mode: 1
@@ -3549,7 +3549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 950881033}
+  m_Material: {fileID: 754407825}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -3599,7 +3599,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5201710019223505489}
-  - component: {fileID: 7603627291644061552}
+  - component: {fileID: 5201710019223505490}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3622,7 +3622,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7603627291644061552
+--- !u!114 &5201710019223505490
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3631,33 +3631,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 212689389150444050}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15b207c217b35554d84dd0eb825b75e7, type: 3}
+  m_Script: {fileID: 11500000, guid: 21dc2bff8018e3346ba827f0303a5d48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tilePrefab: {fileID: 8757432573175238843, guid: 7881391a3b9518746bbc6cd818b6d755, type: 3}
+  tilePrefab: {fileID: 8757432573175238843, guid: 07ccf640577540a4c98fa2ac24a56d24, type: 3}
   gridParent: {fileID: 1994718570}
-  hiddenSprite: {fileID: 7294402857615121082, guid: 38db7e4bda36acc45bd2967ec78f243c, type: 3}
-  shownSprites:
-  - {fileID: 362592318914433213, guid: 92a606de9e70fea4f92ce2cd3ba4fd8c, type: 3}
   currentLevel: 1
-  checkpointLevel: 1
   maxLevel: 10
+  checkpointLevel: 1
+  maxLives: 3
   levelText: {fileID: 1873837023}
   livesText: {fileID: 971439800}
-  maxLives: 3
-  allowClick: 0
-  wrongSprite: {fileID: -7247010117872420444, guid: 857b7448450c473429bfeafcce48e03d, type: 3}
-  timePerLevel: 10
-  timerText: {fileID: 806274898}
-  timerUI: {fileID: 806274897}
-  timesUpPanel: {fileID: 19287838}
-  pauseMenuPanel: {fileID: 1023657535}
-  gameOverPanel: {fileID: 67091831}
   gameCompletedPanel: {fileID: 546065255}
-  pauseButton: {fileID: 967457589}
-  checkpointToastAnimator: {fileID: 1451255293}
-  mainMenuPanel: {fileID: 1445647030}
-  homeButton: {fileID: 330688206}
+  allowClick: 0
   gridSize: 3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
