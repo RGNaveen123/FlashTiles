@@ -286,7 +286,7 @@ public class MemoryGameManager : MonoBehaviour
         if (isTimerRunning && !gameIsPaused)
         {
             timeLeft -= Time.deltaTime;
-            timerText.text = "Time: " + Mathf.CeilToInt(timeLeft);
+            timerText.text = "Timer: " + Mathf.CeilToInt(timeLeft);
 
             float t = Mathf.InverseLerp(timePerLevel, 0f, timeLeft);
             timerText.color = Color.Lerp(Color.white, Color.red, t);

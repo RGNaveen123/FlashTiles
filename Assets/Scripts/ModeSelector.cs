@@ -13,7 +13,7 @@ public class ModeSelector : MonoBehaviour
     public void LoadNumberSequence()
     {
         AudioManager.Instance.PlayButtonSound();
-        SceneManager.LoadScene("SequenceMode");
+        SceneManager.LoadScene("NumberSequence");
         Time.timeScale = 1f;
     }
 

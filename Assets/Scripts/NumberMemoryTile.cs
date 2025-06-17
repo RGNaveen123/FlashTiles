@@ -5,19 +5,30 @@ using UnityEngine.UI;
 public class NumberMemoryTile : MonoBehaviour
 {
     public TextMeshProUGUI numberText;
+    public Image xMarkImage;
+
     public int numberValue;
+    public bool isCorrect = false;
     public bool isClicked = false;
+
     public NumberMemoryGameManager gameManager;
 
-    public void Show()
+    public void ShowNumber()
     {
-        numberText.text = numberValue.ToString();
+        numberText.text = numberValue > 0 ? numberValue.ToString() : "";
+        xMarkImage.gameObject.SetActive(false);
     }
 
-    public void Hide()
+    public void HideNumber()
     {
         numberText.text = "";
+        xMarkImage.gameObject.SetActive(false);
         isClicked = false;
+    }
+
+    public void ShowX()
+    {
+        xMarkImage.gameObject.SetActive(true);
     }
 
     public void OnClick()
@@ -26,17 +37,17 @@ public class NumberMemoryTile : MonoBehaviour
 
         isClicked = true;
 
-        if (gameManager.IsCorrectNumber(numberValue))
+        if (numberValue == gameManager.nextExpectedNumber)
         {
-            Show();
-            gameManager.TileClickedCorrect(numberValue);
+            ShowNumber();
             AudioManager.Instance.PlayCorrectSound();
+            gameManager.OnCorrectTileClicked();
         }
         else
         {
-            Show(); // Optional: briefly show incorrect number
-            gameManager.ReduceLife();
+            ShowX();
             AudioManager.Instance.PlayWrongSound();
+            gameManager.ReduceLife();
         }
     }
 }

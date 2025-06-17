@@ -1,29 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class NumberMemoryGameManager : MonoBehaviour
 {
     public GameObject tilePrefab;
     public Transform gridParent;
-    public int currentLevel = 1;
-    public int maxLevel = 10;
-    public int checkpointLevel = 1;
 
-    public int maxLives = 3;
-    private int currentLives;
     public TextMeshProUGUI levelText;
     public TextMeshProUGUI livesText;
     public GameObject gameCompletedPanel;
 
-    public bool allowClick = false;
-    private int correctTilesClicked = 0;
-    private int totalCorrectTiles = 0;
-    private int nextExpectedNumber = 1;
+    public int currentLevel = 1;
+    public int maxLevel = 10;
+    public int checkpointLevel = 1;
+    public int maxLives = 3;
+    private int currentLives;
 
-    public int gridSize = 3;
+    public bool allowClick = false;
+    public int nextExpectedNumber = 1;
+    private int gridSize = 3;
 
     void Start()
     {
@@ -40,17 +38,12 @@ public class NumberMemoryGameManager : MonoBehaviour
     public void GenerateGrid()
     {
         foreach (Transform child in gridParent)
-        {
             Destroy(child.gameObject);
-        }
 
         gridSize = GetGridSizeForLevel(currentLevel);
-        totalCorrectTiles = gridSize * gridSize;
-        correctTilesClicked = 0;
         nextExpectedNumber = 1;
         currentLives = maxLives;
         UpdateLivesUI();
-        allowClick = false;
 
         AdaptiveGrid adaptiveGrid = gridParent.GetComponent<AdaptiveGrid>();
         if (adaptiveGrid != null)
@@ -60,52 +53,69 @@ public class NumberMemoryGameManager : MonoBehaviour
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayout.constraintCount = gridSize;
 
-        List<int> numbers = new List<int>();
+        int totalTiles = gridSize * gridSize;
 
-        if (currentLevel < 6)
-        {
-            for (int i = 0; i < totalCorrectTiles; i++)
-                numbers.Add(Random.Range(1, 4)); // Random 1–3
-        }
-        else
-        {
-            for (int i = 1; i <= totalCorrectTiles; i++)
-                numbers.Add(i);
-            Shuffle(numbers);
-        }
+        // STEP 1: Shuffle numbers and assign one to each unique row
+        List<int> rowIndices = new List<int>();
+        for (int i = 0; i < gridSize; i++) rowIndices.Add(i);
+        Shuffle(rowIndices); // randomize which row gets which number
 
-        for (int i = 0; i < totalCorrectTiles; i++)
+        // Map from row index to (column, number) assignment
+        Dictionary<int, (int col, int number)> numberedTiles = new Dictionary<int, (int, int)>();
+        for (int number = 1; number <= gridSize; number++)
         {
-            GameObject tile = Instantiate(tilePrefab, gridParent);
-            NumberMemoryTile tileScript = tile.GetComponent<NumberMemoryTile>();
-            tileScript.numberValue = numbers[i];
-            tileScript.numberText = tile.GetComponentInChildren<TextMeshProUGUI>();
-            tileScript.gameManager = this;
-            tileScript.Hide();
-
-            tile.GetComponent<Button>().onClick.AddListener(tileScript.OnClick);
+            int row = rowIndices[number - 1];
+            int col = Random.Range(0, gridSize);
+            numberedTiles[row] = (col, number);
         }
 
-        StartCoroutine(FlashAllTiles());
-        if (levelText != null)
-            levelText.text = "Level: " + currentLevel;
+        // STEP 2: Create grid and assign tile values
+        for (int row = 0; row < gridSize; row++)
+        {
+            for (int col = 0; col < gridSize; col++)
+            {
+                GameObject tile = Instantiate(tilePrefab, gridParent);
+                NumberMemoryTile tileScript = tile.GetComponent<NumberMemoryTile>();
+                tileScript.gameManager = this;
+
+                // Assign number if this is the chosen tile
+                if (numberedTiles.ContainsKey(row) && numberedTiles[row].col == col)
+                {
+                    tileScript.numberValue = numberedTiles[row].number;
+                    tileScript.isCorrect = true;
+                }
+                else
+                {
+                    tileScript.numberValue = 0;
+                    tileScript.isCorrect = false;
+                }
+
+                tileScript.HideNumber();
+                tile.GetComponent<Button>().onClick.AddListener(tileScript.OnClick);
+            }
+        }
+
+        StartCoroutine(FlashCorrectTiles());
     }
 
-    IEnumerator FlashAllTiles()
+
+
+
+    IEnumerator FlashCorrectTiles()
     {
         allowClick = false;
 
-        foreach (Transform t in gridParent)
+        foreach (Transform tile in gridParent)
         {
-            t.GetComponent<NumberMemoryTile>().Show();
+            var script = tile.GetComponent<NumberMemoryTile>();
+            if (script.numberValue > 0)
+                script.ShowNumber();
         }
 
         yield return new WaitForSeconds(1.5f);
 
-        foreach (Transform t in gridParent)
-        {
-            t.GetComponent<NumberMemoryTile>().Hide();
-        }
+        foreach (Transform tile in gridParent)
+            tile.GetComponent<NumberMemoryTile>().HideNumber();
 
         allowClick = true;
     }
@@ -115,37 +125,30 @@ public class NumberMemoryGameManager : MonoBehaviour
         for (int i = list.Count - 1; i > 0; i--)
         {
             int rand = Random.Range(0, i + 1);
-            int temp = list[i];
-            list[i] = list[rand];
-            list[rand] = temp;
+            (list[i], list[rand]) = (list[rand], list[i]);
         }
     }
 
+
+
     int GetGridSizeForLevel(int level)
     {
-        if (level == 1) return 3;
-        else if (level == 2 || level == 3) return 4;
-        else if (level == 4 || level == 5) return 5;
-        else if (level == 6 || level == 7) return 6;
-        else if (level == 8 || level == 9) return 7;
-        else return 8;
+        if (level <= 1) return 3;
+        if (level <= 3) return 4;
+        if (level <= 5) return 5;
+        if (level <= 7) return 6;
+        if (level <= 9) return 7;
+        return 8;
     }
 
-    public bool IsCorrectNumber(int num)
+    public void OnCorrectTileClicked()
     {
-        return num == nextExpectedNumber;
-    }
-
-    public void TileClickedCorrect(int number)
-    {
-        correctTilesClicked++;
         nextExpectedNumber++;
 
-        if (correctTilesClicked >= totalCorrectTiles)
+        if (nextExpectedNumber > gridSize)
         {
-            Debug.Log("Level Completed!");
             AudioManager.Instance.PlayLevelCompleteSound();
-            Invoke(nameof(GoToNextLevel), 1f);
+            Invoke(nameof(NextLevel), 1f);
         }
     }
 
@@ -156,8 +159,8 @@ public class NumberMemoryGameManager : MonoBehaviour
 
         if (currentLives <= 0)
         {
-            Debug.Log("Game Over");
-            // You can add a game over panel
+            Debug.Log("Out of Lives — Restart from checkpoint or show GameOver.");
+            // TODO: Show game over panel if needed
         }
     }
 
@@ -167,21 +170,16 @@ public class NumberMemoryGameManager : MonoBehaviour
             livesText.text = "Lives: " + currentLives;
     }
 
-    void GoToNextLevel()
+    void NextLevel()
     {
         currentLevel++;
-
         if (currentLevel == 6 || currentLevel == 10)
-        {
             checkpointLevel = currentLevel;
-        }
 
         if (currentLevel > maxLevel)
         {
-            Debug.Log("Game Completed");
+            gameCompletedPanel.SetActive(true);
             AudioManager.Instance.PlayGameCompletedSound();
-            if (gameCompletedPanel != null)
-                gameCompletedPanel.SetActive(true);
         }
         else
         {
