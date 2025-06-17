@@ -95,6 +95,10 @@ public class NumberMemoryGameManager : MonoBehaviour
             }
         }
 
+        if (levelText != null)
+            levelText.text = "Level: " + currentLevel;
+
+
         StartCoroutine(FlashCorrectTiles());
     }
 
@@ -169,6 +173,8 @@ public class NumberMemoryGameManager : MonoBehaviour
         if (livesText != null)
             livesText.text = "Lives: " + currentLives;
     }
+
+
 
     void NextLevel()
     {

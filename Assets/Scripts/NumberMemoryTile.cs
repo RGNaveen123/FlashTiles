@@ -33,21 +33,28 @@ public class NumberMemoryTile : MonoBehaviour
 
     public void OnClick()
     {
-        if (isClicked || !gameManager.allowClick) return;
-
-        isClicked = true;
+        if (!gameManager.allowClick) return;
 
         if (numberValue == gameManager.nextExpectedNumber)
         {
+            isClicked = true;  // Only lock tile after correct selection
             ShowNumber();
             AudioManager.Instance.PlayCorrectSound();
             gameManager.OnCorrectTileClicked();
         }
-        else
+        else if (numberValue == 0) // Blank tile
         {
+            isClicked = true;  // Lock wrong tiles so they can't be spammed
             ShowX();
             AudioManager.Instance.PlayWrongSound();
             gameManager.ReduceLife();
+        }
+        else // Number tile, but wrong order
+        {
+            // Don't lock it yet — allow retry
+            AudioManager.Instance.PlayWrongSound();
+            gameManager.ReduceLife();
+            Debug.Log("Wrong order — try again later.");
         }
     }
 }
