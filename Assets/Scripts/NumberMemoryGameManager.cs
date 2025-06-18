@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NumberMemoryGameManager : MonoBehaviour
@@ -23,11 +24,44 @@ public class NumberMemoryGameManager : MonoBehaviour
     public int nextExpectedNumber = 1;
     private int gridSize = 3;
 
+    private bool gameIsPaused = false; // Pausing the game
+
+    //Timer
+    [Header("Timer")]
+    public float timePerLevel = 15f; // Adjustable per level
+    private float timeLeft;
+    private bool isTimerRunning = false;
+    public TextMeshProUGUI timerText;
+    public GameObject timesUpPanel;
+
+    // UI
+    public GameObject pauseButton;
+    public GameObject pauseMenuPanel;
+    public GameObject gameOverPanel;
+
+
     void Start()
     {
         AudioManager.Instance.PlayBGM();
         StartCoroutine(DelayedGridGeneration());
     }
+
+    void Update()
+    {
+        if (isTimerRunning && !gameIsPaused)
+        {
+            timeLeft -= Time.deltaTime;
+
+            if (timerText != null)
+                timerText.text = "Timer: " + Mathf.CeilToInt(timeLeft).ToString();
+
+            if (timeLeft <= 0)
+            {
+                TimeOut();
+            }
+        }
+    }
+
 
     IEnumerator DelayedGridGeneration()
     {
@@ -37,6 +71,8 @@ public class NumberMemoryGameManager : MonoBehaviour
 
     public void GenerateGrid()
     {
+        isTimerRunning = false;
+
         foreach (Transform child in gridParent)
             Destroy(child.gameObject);
 
@@ -122,7 +158,10 @@ public class NumberMemoryGameManager : MonoBehaviour
             tile.GetComponent<NumberMemoryTile>().HideNumber();
 
         allowClick = true;
+        StartTimer(); // Start timer here
     }
+
+
 
     void Shuffle(List<int> list)
     {
@@ -165,7 +204,15 @@ public class NumberMemoryGameManager : MonoBehaviour
         {
             Debug.Log("Out of Lives — Restart from checkpoint or show GameOver.");
             // TODO: Show game over panel if needed
+            GameOver();
         }
+    }
+
+    public void GameOver()
+    {
+        Time.timeScale = 0f;
+        gameOverPanel.SetActive(true);
+        AudioManager.Instance.PlayLevelFailSound();
     }
 
     void UpdateLivesUI()
@@ -179,6 +226,8 @@ public class NumberMemoryGameManager : MonoBehaviour
     void NextLevel()
     {
         currentLevel++;
+        isTimerRunning = false;
+
         if (currentLevel == 6 || currentLevel == 10)
             checkpointLevel = currentLevel;
 
@@ -191,5 +240,104 @@ public class NumberMemoryGameManager : MonoBehaviour
         {
             GenerateGrid();
         }
+    }
+
+    public void RetryFromCheckpoint()
+    {
+        // Resume time (in case game was paused)
+        Time.timeScale = 1f;
+
+        AudioManager.Instance.PlayButtonSound();
+
+        // Hide any open menus
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+        if (timesUpPanel != null) timesUpPanel.SetActive(false);
+
+        // Reset interaction state
+        pauseButton.SetActive(true);
+        allowClick = true;
+        gameIsPaused = false; //add it after i make the changes
+
+        // Reset level and regenerate grid
+        currentLevel = checkpointLevel;
+        GenerateGrid();
+    }
+
+    //Timer Start script
+    void StartTimer()
+    {
+        timeLeft = timePerLevel;
+        isTimerRunning = true;
+
+        if (timerText != null)
+            timerText.text = Mathf.CeilToInt(timeLeft).ToString();
+    }
+
+    void TimeOut()
+    {
+        isTimerRunning = false;
+        allowClick = false;
+        gameIsPaused = true;
+
+        if (timesUpPanel != null)
+            timesUpPanel.SetActive(true);
+
+        AudioManager.Instance.PlayLevelFailSound(); 
+    }
+
+
+    //Ui Manager
+    public void PauseGame()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        Time.timeScale = 0f;
+        pauseMenuPanel.SetActive(true);
+        pauseButton.SetActive(false);
+    }
+
+    public void ResumeGame()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        Time.timeScale = 1f;
+        pauseMenuPanel.SetActive(false);
+        pauseButton.SetActive(true);
+    }
+
+    public void LoadGameModeMenu()
+    {
+        SceneManager.LoadScene("ModeSelector"); // Send me back to the Game Mode Selector
+    }
+
+    public void GoToHome()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        isTimerRunning = false;
+        gameIsPaused = false; // add it after making changes
+        allowClick = false;
+        SceneManager.LoadScene("MainMenu"); //send to Home
+    }
+
+    public void ExitGame()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        Time.timeScale = 2f;
+        HideAllGamePanels();
+        Debug.Log("Exit Pressed");
+        Application.Quit();
+
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+    }
+
+    private void HideAllGamePanels()
+    {
+        pauseMenuPanel.SetActive(false);
+        timesUpPanel.SetActive(false);
+        gameOverPanel.SetActive(false);
+        gameCompletedPanel.SetActive(false);
+        //checkpointToastAnimator.gameObject.SetActive(false);
+        pauseButton.SetActive(false);
     }
 }
