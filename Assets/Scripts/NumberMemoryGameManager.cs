@@ -306,7 +306,9 @@ public class NumberMemoryGameManager : MonoBehaviour
 
     public void LoadGameModeMenu()
     {
+        AudioManager.Instance.PlayButtonSound();
         SceneManager.LoadScene("ModeSelector"); // Send me back to the Game Mode Selector
+
     }
 
     public void GoToHome()
