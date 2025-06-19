@@ -7,9 +7,12 @@ public class NumberMemoryTile : MonoBehaviour
     public TextMeshProUGUI numberText;
     public Image xMarkImage;
 
-    public int numberValue;
+    public int numberValue; // 0 if empty
     public bool isCorrect = false;
-    public bool isClicked = false;
+
+    public bool isClicked = false;      // Was clicked once
+    public bool isRevealed = false;     // Correct tile shown
+    public bool isMarkedWrong = false;  // X marked
 
     public NumberMemoryGameManager gameManager;
 
@@ -17,6 +20,7 @@ public class NumberMemoryTile : MonoBehaviour
     {
         numberText.text = numberValue > 0 ? numberValue.ToString() : "";
         xMarkImage.gameObject.SetActive(false);
+        isRevealed = true;
     }
 
     public void HideNumber()
@@ -24,37 +28,50 @@ public class NumberMemoryTile : MonoBehaviour
         numberText.text = "";
         xMarkImage.gameObject.SetActive(false);
         isClicked = false;
+        isRevealed = false;
+        isMarkedWrong = false;
     }
 
     public void ShowX()
     {
         xMarkImage.gameObject.SetActive(true);
+        isMarkedWrong = true;
     }
 
     public void OnClick()
     {
-        if (!gameManager.allowClick) return;
+        if (!gameManager.allowClick)
+            return;
 
+        //  CASE 1: Tile already revealed as correct (do nothing)
+        if (isRevealed)
+            return;
+
+        //  CASE 2: Tile already marked with X (do nothing)
+        if (isMarkedWrong)
+            return;
+
+        //  CASE 3: Correct number in correct sequence
         if (numberValue == gameManager.nextExpectedNumber)
         {
-            isClicked = true;  // Only lock tile after correct selection
+            isClicked = true;
             ShowNumber();
             AudioManager.Instance.PlayCorrectSound();
             gameManager.OnCorrectTileClicked();
         }
-        else if (numberValue == 0) // Blank tile
+        //  CASE 4: Number tile, but out of order
+        else if (numberValue > 0)
         {
-            isClicked = true;  // Lock wrong tiles so they can't be spammed
-            ShowX();
             AudioManager.Instance.PlayWrongSound();
             gameManager.ReduceLife();
         }
-        else // Number tile, but wrong order
+        //  CASE 5: Empty tile
+        else if (numberValue == 0)
         {
-            // Don't lock it yet — allow retry
+            isClicked = true;
+            ShowX();
             AudioManager.Instance.PlayWrongSound();
             gameManager.ReduceLife();
-            Debug.Log("Wrong order — try again later.");
         }
     }
 }
