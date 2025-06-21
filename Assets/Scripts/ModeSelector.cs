@@ -10,6 +10,13 @@ public class ModeSelector : MonoBehaviour
         Time.timeScale = 1f;
     }
 
+    public void LoadNumberSequence()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        SceneManager.LoadScene("NumberSequence");
+        Time.timeScale = 1f;
+    }
+
     public void BackToMainMenu()
     {
         AudioManager.Instance.PlayButtonSound();

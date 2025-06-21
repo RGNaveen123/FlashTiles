@@ -38,8 +38,6 @@ public class MemoryGameManager : MonoBehaviour
     public GameObject gameCompletedPanel;
     public GameObject pauseButton;
     public Animator checkpointToastAnimator;  // Drag your toast panel here
-    public GameObject mainMenuPanel;
-    public GameObject homeButton;
 
 
 
@@ -222,7 +220,6 @@ public class MemoryGameManager : MonoBehaviour
         // Resume time (in case game was paused)
         Time.timeScale = 1f;
 
-        homeButton.SetActive(false);
         AudioManager.Instance.PlayButtonSound();
 
         // Hide any open menus
@@ -286,7 +283,7 @@ public class MemoryGameManager : MonoBehaviour
         if (isTimerRunning && !gameIsPaused)
         {
             timeLeft -= Time.deltaTime;
-            timerText.text = "Time: " + Mathf.CeilToInt(timeLeft);
+            timerText.text = "Timer: " + Mathf.CeilToInt(timeLeft);
 
             float t = Mathf.InverseLerp(timePerLevel, 0f, timeLeft);
             timerText.color = Color.Lerp(Color.white, Color.red, t);
@@ -348,7 +345,6 @@ public class MemoryGameManager : MonoBehaviour
         Time.timeScale = 0f;
         pauseMenuPanel.SetActive(true);
         pauseButton.SetActive(false);
-        homeButton.SetActive(true);
     }
 
     public void ResumeGame()
@@ -357,7 +353,6 @@ public class MemoryGameManager : MonoBehaviour
         Time.timeScale = 1f;
         pauseMenuPanel.SetActive(false);
         pauseButton.SetActive(true);
-        homeButton.SetActive(false);
     }
 
     public void GameOver()
@@ -365,7 +360,6 @@ public class MemoryGameManager : MonoBehaviour
         Time.timeScale = 0f;
         gameOverPanel.SetActive(true);
         AudioManager.Instance.PlayLevelFailSound();
-        homeButton.SetActive(true);
     }
 
     void ShowCheckpointToast()
@@ -401,7 +395,6 @@ public class MemoryGameManager : MonoBehaviour
 
         // Load the game scene fresh
         SceneManager.LoadScene("MemoryGameScene");
-        mainMenuPanel.SetActive(false);
     }
 
     private void HideAllGamePanels()
@@ -413,7 +406,12 @@ public class MemoryGameManager : MonoBehaviour
         checkpointToastAnimator.gameObject.SetActive(false);
         pauseButton.SetActive(false);
         timerUI.SetActive(false);
-        homeButton.SetActive(false);
+    }
+
+    public void LoadGameModeMenu()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        SceneManager.LoadScene("ModeSelector"); // Send me back to the Game Mode Selector
     }
 
 
