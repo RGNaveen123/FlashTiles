@@ -39,9 +39,27 @@ public class NumberMemoryGameManager : MonoBehaviour
     public GameObject pauseMenuPanel;
     public GameObject gameOverPanel;
 
+    //Time 
+    [Header("Speed Run Timer")]
+    private float totalRunTime = 0f;
+    private bool isRunTimerRunning = false;
+
+    public TextMeshProUGUI currentRunTimeText;
+    public TextMeshProUGUI currentTimeText;
+    public TextMeshProUGUI bestRunTimeText;
+    public TextMeshProUGUI motivationalText;
+
+    //Checkpoint
+    public Animator checkpointToastAnimator; // Drag the Animator here
+
+
+
 
     void Start()
     {
+        totalRunTime = 0f;
+        isRunTimerRunning = true;
+
         AudioManager.Instance.PlayBGM();
         StartCoroutine(DelayedGridGeneration());
     }
@@ -60,6 +78,15 @@ public class NumberMemoryGameManager : MonoBehaviour
                 TimeOut();
             }
         }
+
+        if (isRunTimerRunning)
+        {
+            totalRunTime += Time.deltaTime;
+
+            if (currentRunTimeText != null)
+                currentRunTimeText.text = "Time: " + totalRunTime.ToString("F1") + "s";
+        }
+
     }
 
 
@@ -228,14 +255,58 @@ public class NumberMemoryGameManager : MonoBehaviour
         currentLevel++;
         isTimerRunning = false;
 
+
         if (currentLevel == 6 || currentLevel == 10)
+        {
             checkpointLevel = currentLevel;
+            ShowCheckpointToast();
+        }
 
         if (currentLevel > maxLevel)
         {
-            gameCompletedPanel.SetActive(true);
+            // Optionally play a victory sound
             AudioManager.Instance.PlayGameCompletedSound();
+            currentRunTimeText.gameObject.SetActive(false);
+            isRunTimerRunning = false;
+            allowClick = false;
+
+            // Show Game Completed Panel
+            if (gameCompletedPanel != null)
+                gameCompletedPanel.SetActive(true);
+
+            // Round and show current time
+            if (currentTimeText != null)
+                currentTimeText.text = totalRunTime.ToString("F1") + "s";
+
+            // Get saved best time
+            float savedBest = PlayerPrefs.GetFloat("BestSpeedRunTime", float.MaxValue);
+            bool isNewBest = false;
+
+            if (totalRunTime < savedBest)
+            {
+                PlayerPrefs.SetFloat("BestSpeedRunTime", totalRunTime);
+                PlayerPrefs.Save();
+                isNewBest = true;
+            }
+
+            // Show best time
+            if (bestRunTimeText != null)
+            {
+                float displayed = PlayerPrefs.GetFloat("BestSpeedRunTime");
+                bestRunTimeText.text = displayed.ToString("F1") + "s";
+            }
+
+            // Show motivational message
+            if (motivationalText != null)
+            {
+                if (isNewBest)
+                    motivationalText.text = " New Personal Best!";
+
+                else
+                    motivationalText.text = " Try again to beat your best!";
+            }
         }
+
         else
         {
             GenerateGrid();
@@ -283,7 +354,7 @@ public class NumberMemoryGameManager : MonoBehaviour
         if (timesUpPanel != null)
             timesUpPanel.SetActive(true);
 
-        AudioManager.Instance.PlayLevelFailSound(); 
+        AudioManager.Instance.PlayLevelFailSound();
     }
 
 
@@ -342,4 +413,44 @@ public class NumberMemoryGameManager : MonoBehaviour
         //checkpointToastAnimator.gameObject.SetActive(false);
         pauseButton.SetActive(false);
     }
+
+    //Checkpoint script
+
+    private bool checkpointToastShowing = false;
+
+    public void ShowCheckpointToast()
+    {
+        if (checkpointToastAnimator != null && !checkpointToastShowing)
+        {
+            checkpointToastShowing = true;
+
+            // Activate and play SlideIn
+            checkpointToastAnimator.gameObject.SetActive(true);
+            checkpointToastAnimator.Play("SlideIn", -1, 0f);
+
+            // Schedule slide out after delay
+            Invoke(nameof(TriggerSlideOut), 2f);
+        }
+    }
+
+    private void TriggerSlideOut()
+    {
+        if (checkpointToastAnimator != null)
+        {
+            checkpointToastAnimator.Play("SlideOutRight");
+            Invoke(nameof(HideCheckpointToast), 1f); // Hide toast panel after SlideOut finishes
+        }
+    }
+
+    private void HideCheckpointToast()
+    {
+        if (checkpointToastAnimator != null)
+        {
+            checkpointToastAnimator.gameObject.SetActive(false);
+            checkpointToastShowing = false;
+        }
+    }
+
+
+
 }
