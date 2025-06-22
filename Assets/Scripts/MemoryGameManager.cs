@@ -43,6 +43,7 @@ public class MemoryGameManager : MonoBehaviour
     [Header("Speed Run Timer")]
     private float totalRunTime = 0f;
     private bool isRunTimerRunning = false;
+    private bool isRunTimerPaused = false;
 
     public TextMeshProUGUI currentRunTimeText;
     public TextMeshProUGUI currentTimeText;
@@ -51,7 +52,10 @@ public class MemoryGameManager : MonoBehaviour
 
     // Modekey 
     public string modeKey = "Memory";
-    
+
+    // timer reset point
+    private float checkpointRunTime = 0f;
+
 
 
 
@@ -76,28 +80,30 @@ public class MemoryGameManager : MonoBehaviour
     IEnumerator FlashCorrectTilesThenEnableClicks(List<MemoryTile> correctTiles)
     {
         allowClick = false;
+        isRunTimerPaused = true;
 
-        yield return new WaitForSeconds(1f); // optional delay before showing
+        // Short delay to let player get ready
+        yield return new WaitForSeconds(1f);
 
-
-        // Show all correct tiles
+        // Show correct tiles
         foreach (var tile in correctTiles)
         {
             tile.Show();
         }
 
-        // Wait while they are visible
         yield return new WaitForSeconds(1f);
 
-        // Hide them again
         foreach (var tile in correctTiles)
         {
             tile.Hide();
         }
 
-        // Enable clicking
         allowClick = true;
+        isRunTimerPaused = false;
+
+        StartTimer(); // Timer for level countdown starts now
     }
+
 
 
 
@@ -137,8 +143,6 @@ public class MemoryGameManager : MonoBehaviour
         currentLives = maxLives;
         UpdateLivesUI();
         timerUI.SetActive(false); // Hide timer while flashing
-
-        Invoke(nameof(StartTimer), 1.5f);  // Slight delay after flash
 
 
 
@@ -212,6 +216,7 @@ public class MemoryGameManager : MonoBehaviour
         if (currentLevel == 6)
         {
             checkpointLevel = currentLevel;
+            checkpointRunTime = totalRunTime;
             Debug.Log("Checkpoint saved at Level " + checkpointLevel);
 
             // Show checkpoint UI
@@ -325,6 +330,17 @@ public class MemoryGameManager : MonoBehaviour
             GameOver();
             //RetryFromCheckpoint();  // Or call GenerateGrid() if you want to retry same level
         }
+
+        if (currentLevel < checkpointLevel)
+        {
+            // Player hadn't reached checkpoint yet
+            totalRunTime = 0f;
+        }
+        else
+        {
+            // Player reached checkpoint earlier, restore time
+            totalRunTime = checkpointRunTime;
+        }
     }
 
     void StartTimer()
@@ -351,13 +367,14 @@ public class MemoryGameManager : MonoBehaviour
             }
         }
 
-        if (isRunTimerRunning)
+        if (isRunTimerRunning && !gameIsPaused && !isRunTimerPaused)
         {
             totalRunTime += Time.deltaTime;
 
             if (currentRunTimeText != null)
                 currentRunTimeText.text = "Time: " + totalRunTime.ToString("F1") + "s";
         }
+
 
     }
 
@@ -366,6 +383,18 @@ public class MemoryGameManager : MonoBehaviour
         isTimerRunning = false;
         allowClick = false;
         gameIsPaused = true;
+        
+
+        if (currentLevel < checkpointLevel)
+        {
+            // Player hadn't reached checkpoint yet
+            totalRunTime = 0f;
+        }
+        else
+        {
+            // Player reached checkpoint earlier, restore time
+            totalRunTime = checkpointRunTime;
+        }
 
         AudioManager.Instance.PlayLevelFailSound();
 

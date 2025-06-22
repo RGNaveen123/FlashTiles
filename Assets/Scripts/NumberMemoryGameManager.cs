@@ -43,6 +43,8 @@ public class NumberMemoryGameManager : MonoBehaviour
     [Header("Speed Run Timer")]
     private float totalRunTime = 0f;
     private bool isRunTimerRunning = false;
+    private bool isRunTimerPaused = false;
+
 
     public TextMeshProUGUI currentRunTimeText;
     public TextMeshProUGUI currentTimeText;
@@ -54,6 +56,10 @@ public class NumberMemoryGameManager : MonoBehaviour
 
     //Modekey For finding which mode
     public string modeKey = "Number";
+
+    // Timer reset point 
+    private float checkpointRunTime = 0f;
+
 
 
 
@@ -82,7 +88,7 @@ public class NumberMemoryGameManager : MonoBehaviour
             }
         }
 
-        if (isRunTimerRunning)
+        if (isRunTimerRunning && !isRunTimerPaused)
         {
             totalRunTime += Time.deltaTime;
 
@@ -174,7 +180,12 @@ public class NumberMemoryGameManager : MonoBehaviour
     IEnumerator FlashCorrectTiles()
     {
         allowClick = false;
+        isRunTimerPaused = true;
 
+        // OPTIONAL: short pause before flashing numbers
+        yield return new WaitForSeconds(1f); // Freeze screen before flashing
+
+        // Show all number tiles briefly
         foreach (Transform tile in gridParent)
         {
             var script = tile.GetComponent<NumberMemoryTile>();
@@ -182,14 +193,20 @@ public class NumberMemoryGameManager : MonoBehaviour
                 script.ShowNumber();
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.5f); // Time while numbers are visible
 
+        // Hide them again
         foreach (Transform tile in gridParent)
-            tile.GetComponent<NumberMemoryTile>().HideNumber();
+        {
+            var script = tile.GetComponent<NumberMemoryTile>();
+            script.HideNumber();
+        }
 
         allowClick = true;
-        StartTimer(); // Start timer here
+        isRunTimerPaused = false; //  Resume speed run
+        StartTimer(); // starts the countdown timer for level
     }
+
 
 
 
@@ -236,6 +253,17 @@ public class NumberMemoryGameManager : MonoBehaviour
             // TODO: Show game over panel if needed
             GameOver();
         }
+
+        if (currentLevel < checkpointLevel)
+        {
+            // Player hadn't reached checkpoint yet
+            totalRunTime = 0f;
+        }
+        else
+        {
+            // Player reached checkpoint earlier, restore time
+            totalRunTime = checkpointRunTime;
+        }
     }
 
     public void GameOver()
@@ -262,6 +290,7 @@ public class NumberMemoryGameManager : MonoBehaviour
         if (currentLevel == 6)
         {
             checkpointLevel = currentLevel;
+            checkpointRunTime = totalRunTime;
             ShowCheckpointToast();
         }
 
@@ -375,6 +404,18 @@ public class NumberMemoryGameManager : MonoBehaviour
         isTimerRunning = false;
         allowClick = false;
         gameIsPaused = true;
+        isRunTimerPaused = true; // Pause during Time's Up panel
+
+        if (currentLevel < checkpointLevel)
+        {
+            // Player hadn't reached checkpoint yet
+            totalRunTime = 0f;
+        }
+        else
+        {
+            // Player reached checkpoint earlier, restore time
+            totalRunTime = checkpointRunTime;
+        }
 
         if (timesUpPanel != null)
             timesUpPanel.SetActive(true);
