@@ -52,6 +52,9 @@ public class NumberMemoryGameManager : MonoBehaviour
     //Checkpoint
     public Animator checkpointToastAnimator; // Drag the Animator here
 
+    //Modekey For finding which mode
+    public string modeKey = "Number";
+
 
 
 
@@ -256,7 +259,7 @@ public class NumberMemoryGameManager : MonoBehaviour
         isTimerRunning = false;
 
 
-        if (currentLevel == 6 || currentLevel == 10)
+        if (currentLevel == 6)
         {
             checkpointLevel = currentLevel;
             ShowCheckpointToast();
@@ -279,12 +282,13 @@ public class NumberMemoryGameManager : MonoBehaviour
                 currentTimeText.text = totalRunTime.ToString("F1") + "s";
 
             // Get saved best time
-            float savedBest = PlayerPrefs.GetFloat("BestSpeedRunTime", float.MaxValue);
+            string bestTimeKey = "BestTime_" + modeKey; // e.g., BestTime_Memory
+            float savedBest = PlayerPrefs.GetFloat(bestTimeKey, float.MaxValue);
             bool isNewBest = false;
 
             if (totalRunTime < savedBest)
             {
-                PlayerPrefs.SetFloat("BestSpeedRunTime", totalRunTime);
+                PlayerPrefs.SetFloat(bestTimeKey, totalRunTime);
                 PlayerPrefs.Save();
                 isNewBest = true;
             }
@@ -292,8 +296,11 @@ public class NumberMemoryGameManager : MonoBehaviour
             // Show best time
             if (bestRunTimeText != null)
             {
-                float displayed = PlayerPrefs.GetFloat("BestSpeedRunTime");
-                bestRunTimeText.text = displayed.ToString("F1") + "s";
+                float bestTime = PlayerPrefs.GetFloat("BestTime_" + modeKey, float.MaxValue);
+                if (bestTime == float.MaxValue)
+                    bestRunTimeText.text = "—";
+                else
+                    bestRunTimeText.text = bestTime.ToString("F1") + "s";
             }
 
             // Show motivational message
@@ -334,6 +341,24 @@ public class NumberMemoryGameManager : MonoBehaviour
         currentLevel = checkpointLevel;
         GenerateGrid();
     }
+
+    public void RestartGameFromBeginning()
+    {
+        AudioManager.Instance.PlayButtonSound();
+
+        // Reset variables
+        currentLevel = 1;
+        checkpointLevel = 1;
+        totalRunTime = 0f;
+
+        isTimerRunning = false;
+        isRunTimerRunning = false;
+
+        Time.timeScale = 1f; // Just in case
+
+        SceneManager.LoadScene("NumberSequence"); // Your scene name here
+    }
+
 
     //Timer Start script
     void StartTimer()

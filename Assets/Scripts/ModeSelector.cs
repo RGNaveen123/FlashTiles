@@ -20,6 +20,6 @@ public class ModeSelector : MonoBehaviour
     public void BackToMainMenu()
     {
         AudioManager.Instance.PlayButtonSound();
-        SceneManager.LoadScene("StartMenuScene");
+        SceneManager.LoadScene("MainMenu");
     }
 }
