@@ -58,15 +58,25 @@ public class MemoryGameManager : MonoBehaviour
 
 
 
-
-
     public int gridSize = 3;  // starting with 3x3
 
 
     void Start()
     {
+        // Load custom settings
+        bool isSpeedRun = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
+        bool isTimerOn = PlayerPrefs.GetInt("EnableTimer", 1) == 1;
+        float savedTime = PlayerPrefs.GetFloat("TimerDuration", 15f);
+        int savedLives = PlayerPrefs.GetInt("NumLives", 3);
+
+        // Apply them
+        if (!isSpeedRun) isRunTimerRunning = false;   // Disables speed run timer
+        if (!isTimerOn) timePerLevel = 99999f;        // Set timer really high (or skip StartTimer)
+        maxLives = savedLives;
+        timePerLevel = savedTime;
+
         totalRunTime = 0f;
-        isRunTimerRunning = true;
+        isRunTimerRunning = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
         StartCoroutine(DelayedGridGeneration());
 
     }
@@ -345,9 +355,15 @@ public class MemoryGameManager : MonoBehaviour
 
     void StartTimer()
     {
+        if (PlayerPrefs.GetInt("EnableTimer", 1) == 0)
+            return; // Timer is OFF
+
         timerUI.SetActive(true); // Show timer when play starts
         timeLeft = timePerLevel;
         isTimerRunning = true;
+
+        if (timerText != null)
+            timerText.text = Mathf.CeilToInt(timeLeft).ToString();
 
     }
 

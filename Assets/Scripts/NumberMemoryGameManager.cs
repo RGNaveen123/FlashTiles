@@ -66,8 +66,21 @@ public class NumberMemoryGameManager : MonoBehaviour
 
     void Start()
     {
+
+        bool isSpeedRun = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
+        bool isTimerOn = PlayerPrefs.GetInt("EnableTimer", 1) == 1;
+        float savedTime = PlayerPrefs.GetFloat("TimerDuration", 15f);
+        int savedLives = PlayerPrefs.GetInt("NumLives", 3);
+
+        // Apply them
+        if (!isSpeedRun) isRunTimerRunning = false;   // Disables speed run timer
+        if (!isTimerOn) timePerLevel = 99999f;        // Set timer really high (or skip StartTimer)
+        maxLives = savedLives;
+        timePerLevel = savedTime;
+
         totalRunTime = 0f;
-        isRunTimerRunning = true;
+        isRunTimerRunning = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
+
 
         AudioManager.Instance.PlayBGM();
         StartCoroutine(DelayedGridGeneration());
@@ -392,6 +405,9 @@ public class NumberMemoryGameManager : MonoBehaviour
     //Timer Start script
     void StartTimer()
     {
+        if (PlayerPrefs.GetInt("EnableTimer", 1) == 0)
+            return; // Timer is OFF
+
         timeLeft = timePerLevel;
         isTimerRunning = true;
 
