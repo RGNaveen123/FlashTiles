@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -63,22 +63,34 @@ public class MemoryGameManager : MonoBehaviour
 
     void Start()
     {
-        // Load custom settings
+        // —––––– SETTINGS —–––––
         bool isSpeedRun = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
         bool isTimerOn = PlayerPrefs.GetInt("EnableTimer", 1) == 1;
         float savedTime = PlayerPrefs.GetFloat("TimerDuration", 15f);
         int savedLives = PlayerPrefs.GetInt("NumLives", 3);
 
-        // Apply them
-        if (!isSpeedRun) isRunTimerRunning = false;   // Disables speed run timer
-        if (!isTimerOn) timePerLevel = 99999f;        // Set timer really high (or skip StartTimer)
         maxLives = savedLives;
-        timePerLevel = savedTime;
+        timePerLevel = isTimerOn ? savedTime : 99999f;
 
-        totalRunTime = 0f;
-        isRunTimerRunning = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
+        // —––––– RUN TIMER INIT —–––––
+        isRunTimerRunning = isSpeedRun;
+
+        /* NEW → clear any stale checkpoint time when we truly start from level 1 */
+        if (currentLevel == 1)
+        {
+            PlayerPrefs.SetFloat("CheckpointTime", 0f);
+            totalRunTime = 0f;
+        }
+        else if (isRunTimerRunning && currentLevel == checkpointLevel)   // restarting from a checkpoint
+        {
+            totalRunTime = PlayerPrefs.GetFloat("CheckpointTime", 0f);
+        }
+        else
+        {
+            totalRunTime = 0f;
+        }
+
         StartCoroutine(DelayedGridGeneration());
-
     }
 
     IEnumerator DelayedGridGeneration()
@@ -116,7 +128,7 @@ public class MemoryGameManager : MonoBehaviour
 
 
 
-
+    /*---------------------------  GENERATE GRID  --------------------*/
     public void GenerateGrid()
     {
         // Clear previous tiles
@@ -152,6 +164,7 @@ public class MemoryGameManager : MonoBehaviour
         // Handling life as per clicks
         currentLives = maxLives;
         UpdateLivesUI();
+
         timerUI.SetActive(false); // Hide timer while flashing
 
 
@@ -217,19 +230,21 @@ public class MemoryGameManager : MonoBehaviour
         else return 8; // Level 10
     }
 
+    /*-------------  NEXT  LEVEL  &  CHECKPOINT  SAVE  -------------*/
     public void GoToNextLevel()
     {
         currentLevel++;
         isTimerRunning = false;
         timerUI.SetActive(false);
-        // Checkpoint logic
+
         if (currentLevel == 6)
         {
             checkpointLevel = currentLevel;
             checkpointRunTime = totalRunTime;
-            Debug.Log("Checkpoint saved at Level " + checkpointLevel);
 
-            // Show checkpoint UI
+            if (isRunTimerRunning)
+                PlayerPrefs.SetFloat("CheckpointTime", totalRunTime);   // save
+
             ShowCheckpointToast();
         }
 
@@ -267,7 +282,7 @@ public class MemoryGameManager : MonoBehaviour
             {
                 float bestTime = PlayerPrefs.GetFloat("BestTime_" + modeKey, float.MaxValue);
                 if (bestTime == float.MaxValue)
-                    bestRunTimeText.text = "�";
+                    bestRunTimeText.text = "—";
                 else
                     bestRunTimeText.text = bestTime.ToString("F1") + "s";
             }
@@ -287,12 +302,16 @@ public class MemoryGameManager : MonoBehaviour
         GenerateGrid();
     }
 
+    /*---- RETRY  FROM  CHECKPOINT ---−*/
     public void RetryFromCheckpoint()
     {
         // Resume time (in case game was paused)
         Time.timeScale = 1f;
-
         AudioManager.Instance.PlayButtonSound();
+        currentRunTimeText.gameObject.SetActive(false);
+
+        if (isRunTimerRunning)
+            totalRunTime = PlayerPrefs.GetFloat("CheckpointTime", 0f);
 
         // Hide any open menus
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
@@ -340,31 +359,20 @@ public class MemoryGameManager : MonoBehaviour
             GameOver();
             //RetryFromCheckpoint();  // Or call GenerateGrid() if you want to retry same level
         }
-
-        if (currentLevel < checkpointLevel)
-        {
-            // Player hadn't reached checkpoint yet
-            totalRunTime = 0f;
-        }
-        else
-        {
-            // Player reached checkpoint earlier, restore time
-            totalRunTime = checkpointRunTime;
-        }
     }
 
+    /*-------------  START TIMER  -------------*/
     void StartTimer()
     {
-        if (PlayerPrefs.GetInt("EnableTimer", 1) == 0)
-            return; // Timer is OFF
+        currentRunTimeText.gameObject.SetActive(true);
+        if (PlayerPrefs.GetInt("EnableTimer", 1) == 0) return;
 
-        timerUI.SetActive(true); // Show timer when play starts
+        timerUI.SetActive(true);           // pop-in when countdown really starts
         timeLeft = timePerLevel;
         isTimerRunning = true;
 
         if (timerText != null)
             timerText.text = Mathf.CeilToInt(timeLeft).ToString();
-
     }
 
     void Update()
@@ -388,33 +396,19 @@ public class MemoryGameManager : MonoBehaviour
             totalRunTime += Time.deltaTime;
 
             if (currentRunTimeText != null)
-                currentRunTimeText.text = "Time: " + totalRunTime.ToString("F1") + "s";
+                currentRunTimeText.text = "TIME: " + totalRunTime.ToString("F1") + "s";
         }
 
 
     }
-
     void TimeOut()
     {
         isTimerRunning = false;
         allowClick = false;
         gameIsPaused = true;
-        
-
-        if (currentLevel < checkpointLevel)
-        {
-            // Player hadn't reached checkpoint yet
-            totalRunTime = 0f;
-        }
-        else
-        {
-            // Player reached checkpoint earlier, restore time
-            totalRunTime = checkpointRunTime;
-        }
-
+        timerUI.SetActive(false);          // hide
+        timesUpPanel.SetActive(true);
         AudioManager.Instance.PlayLevelFailSound();
-
-        timesUpPanel.SetActive(true); // Show the panel
     }
 
 
@@ -466,10 +460,13 @@ public class MemoryGameManager : MonoBehaviour
         pauseButton.SetActive(true);
     }
 
+    /*----- GAME  OVER  &  TIME  OUT  ——  hide the UI as soon as round ends */
     public void GameOver()
     {
         Time.timeScale = 0f;
         gameOverPanel.SetActive(true);
+        timerUI.SetActive(false);          // hide
+        currentTimeText.gameObject.SetActive(false);
         AudioManager.Instance.PlayLevelFailSound();
     }
 
@@ -508,31 +505,35 @@ public class MemoryGameManager : MonoBehaviour
         }
     }
 
+    /*---- HOME  BUTTON (leave game) ---−*/
     public void GoToHome()
     {
         AudioManager.Instance.PlayButtonSound();
         HideAllGamePanels();
-        isTimerRunning = false;
-        gameIsPaused = false;
-        allowClick = false;
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    public void RestartGameFromBeginning()
-    {
-        AudioManager.Instance.PlayButtonSound();
-
-        // Reset variables
-        currentLevel = 1;
-        checkpointLevel = 1;
-        totalRunTime = 0f;
 
         isTimerRunning = false;
         isRunTimerRunning = false;
+        totalRunTime = 0f;                                /** NEW **/
+        PlayerPrefs.SetFloat("CheckpointTime", 0f);            /** NEW **/
 
-        Time.timeScale = 1f; // Just in case
+        SceneManager.LoadScene("MainMenu");
+    }
 
-        SceneManager.LoadScene("MemoryGameScene"); // Your scene name here
+    /*---- RESTART  ENTIRE  RUN ---−*/
+    public void RestartGameFromBeginning()
+    {
+        currentRunTimeText.gameObject.SetActive(false);
+        AudioManager.Instance.PlayButtonSound();
+        PlayerPrefs.SetFloat("CheckpointTime", 0f);   // clear
+        totalRunTime = 0f;
+
+        currentLevel = 1;
+        checkpointLevel = 1;
+        isTimerRunning = false;
+        isRunTimerRunning = false;
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MemoryGameScene");
     }
 
     private void HideAllGamePanels()

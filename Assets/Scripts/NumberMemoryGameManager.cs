@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -67,22 +67,34 @@ public class NumberMemoryGameManager : MonoBehaviour
     void Start()
     {
 
-        bool isSpeedRun = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
-        bool isTimerOn = PlayerPrefs.GetInt("EnableTimer", 1) == 1;
-        float savedTime = PlayerPrefs.GetFloat("TimerDuration", 15f);
-        int savedLives = PlayerPrefs.GetInt("NumLives", 3);
+        // Load player settings
+        bool speedRun = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
+        bool timerOn = PlayerPrefs.GetInt("EnableTimer", 1) == 1;
+        float dur = PlayerPrefs.GetFloat("TimerDuration", 15f);
+        int lives = PlayerPrefs.GetInt("NumLives", 3);
 
-        // Apply them
-        if (!isSpeedRun) isRunTimerRunning = false;   // Disables speed run timer
-        if (!isTimerOn) timePerLevel = 99999f;        // Set timer really high (or skip StartTimer)
-        maxLives = savedLives;
-        timePerLevel = savedTime;
+        maxLives = lives;
+        timePerLevel = timerOn ? dur : 99999f;
+        isRunTimerRunning = speedRun;
 
-        totalRunTime = 0f;
-        isRunTimerRunning = PlayerPrefs.GetInt("EnableSpeedRun", 1) == 1;
+        // Reset run-timer if starting from level 1
+        if (currentLevel == 1)
+        {
+            PlayerPrefs.SetFloat("CheckpointTime", 0f);
+            totalRunTime = 0f;
+        }
+        else if (isRunTimerRunning && currentLevel == checkpointLevel)
+        {
+            totalRunTime = PlayerPrefs.GetFloat("CheckpointTime", 0f);
+        }
+        else
+        {
+            totalRunTime = 0f;
+        }
 
-
-        AudioManager.Instance.PlayBGM();
+        // Hide speed-run timer if OFF
+        if (!isRunTimerRunning && currentRunTimeText != null)
+            currentRunTimeText.gameObject.SetActive(false);
         StartCoroutine(DelayedGridGeneration());
     }
 
@@ -106,7 +118,7 @@ public class NumberMemoryGameManager : MonoBehaviour
             totalRunTime += Time.deltaTime;
 
             if (currentRunTimeText != null)
-                currentRunTimeText.text = "Time: " + totalRunTime.ToString("F1") + "s";
+                currentRunTimeText.text = "TIME: " + totalRunTime.ToString("F1") + "s";
         }
 
     }
@@ -121,6 +133,7 @@ public class NumberMemoryGameManager : MonoBehaviour
     public void GenerateGrid()
     {
         isTimerRunning = false;
+        timerText.gameObject.SetActive(false); // hide until countdown starts
 
         foreach (Transform child in gridParent)
             Destroy(child.gameObject);
@@ -139,6 +152,7 @@ public class NumberMemoryGameManager : MonoBehaviour
         gridLayout.constraintCount = gridSize;
 
         int totalTiles = gridSize * gridSize;
+        timerText.gameObject.SetActive(false); //  hide the timer UI before flashing
 
         // STEP 1: Shuffle numbers and assign one to each unique row
         List<int> rowIndices = new List<int>();
@@ -262,27 +276,19 @@ public class NumberMemoryGameManager : MonoBehaviour
 
         if (currentLives <= 0)
         {
-            Debug.Log("Out of Lives — Restart from checkpoint or show GameOver.");
+            Debug.Log("Out of Lives â€” Restart from checkpoint or show GameOver.");
             // TODO: Show game over panel if needed
             GameOver();
         }
 
-        if (currentLevel < checkpointLevel)
-        {
-            // Player hadn't reached checkpoint yet
-            totalRunTime = 0f;
-        }
-        else
-        {
-            // Player reached checkpoint earlier, restore time
-            totalRunTime = checkpointRunTime;
-        }
+
     }
 
     public void GameOver()
     {
         Time.timeScale = 0f;
         gameOverPanel.SetActive(true);
+        timerText.gameObject.SetActive(false);   //  Number mode
         AudioManager.Instance.PlayLevelFailSound();
     }
 
@@ -302,6 +308,9 @@ public class NumberMemoryGameManager : MonoBehaviour
 
         if (currentLevel == 6)
         {
+            if (isRunTimerRunning)
+                PlayerPrefs.SetFloat("CheckpointTime", totalRunTime);
+
             checkpointLevel = currentLevel;
             checkpointRunTime = totalRunTime;
             ShowCheckpointToast();
@@ -340,7 +349,7 @@ public class NumberMemoryGameManager : MonoBehaviour
             {
                 float bestTime = PlayerPrefs.GetFloat("BestTime_" + modeKey, float.MaxValue);
                 if (bestTime == float.MaxValue)
-                    bestRunTimeText.text = "—";
+                    bestRunTimeText.text = "â€”";
                 else
                     bestRunTimeText.text = bestTime.ToString("F1") + "s";
             }
@@ -367,7 +376,11 @@ public class NumberMemoryGameManager : MonoBehaviour
         // Resume time (in case game was paused)
         Time.timeScale = 1f;
 
+        currentRunTimeText.gameObject.SetActive(false);
+
         AudioManager.Instance.PlayButtonSound();
+        if (isRunTimerRunning)
+            totalRunTime = PlayerPrefs.GetFloat("CheckpointTime", 0f);
 
         // Hide any open menus
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
@@ -387,6 +400,9 @@ public class NumberMemoryGameManager : MonoBehaviour
     public void RestartGameFromBeginning()
     {
         AudioManager.Instance.PlayButtonSound();
+        currentRunTimeText.gameObject.SetActive(false);
+        PlayerPrefs.SetFloat("CheckpointTime", 0f);
+        totalRunTime = 0f;
 
         // Reset variables
         currentLevel = 1;
@@ -397,7 +413,8 @@ public class NumberMemoryGameManager : MonoBehaviour
         isRunTimerRunning = false;
 
         Time.timeScale = 1f; // Just in case
-
+        PlayerPrefs.SetFloat("CheckpointTime", 0f);
+        totalRunTime = 0f;
         SceneManager.LoadScene("NumberSequence"); // Your scene name here
     }
 
@@ -405,9 +422,11 @@ public class NumberMemoryGameManager : MonoBehaviour
     //Timer Start script
     void StartTimer()
     {
+        currentRunTimeText.gameObject.SetActive(true); // show again
         if (PlayerPrefs.GetInt("EnableTimer", 1) == 0)
             return; // Timer is OFF
 
+        timerText.gameObject.SetActive(true); // Show timer when countdown begins
         timeLeft = timePerLevel;
         isTimerRunning = true;
 
@@ -421,17 +440,7 @@ public class NumberMemoryGameManager : MonoBehaviour
         allowClick = false;
         gameIsPaused = true;
         isRunTimerPaused = true; // Pause during Time's Up panel
-
-        if (currentLevel < checkpointLevel)
-        {
-            // Player hadn't reached checkpoint yet
-            totalRunTime = 0f;
-        }
-        else
-        {
-            // Player reached checkpoint earlier, restore time
-            totalRunTime = checkpointRunTime;
-        }
+        timerText.gameObject.SetActive(false);   //  Number mode
 
         if (timesUpPanel != null)
             timesUpPanel.SetActive(true);
@@ -470,6 +479,8 @@ public class NumberMemoryGameManager : MonoBehaviour
         isTimerRunning = false;
         gameIsPaused = false; // add it after making changes
         allowClick = false;
+        PlayerPrefs.SetFloat("CheckpointTime", 0f);
+        totalRunTime = 0f;
         SceneManager.LoadScene("MainMenu"); //send to Home
     }
 
