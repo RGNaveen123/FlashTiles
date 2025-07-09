@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 
+
 public class MemoryGameManager : MonoBehaviour
 {
     public GameObject tilePrefab;
@@ -254,12 +255,17 @@ public class MemoryGameManager : MonoBehaviour
             // Optionally play a victory sound
             AudioManager.Instance.PlayGameCompletedSound();
             currentRunTimeText.gameObject.SetActive(false);
+
             isRunTimerRunning = false;
             allowClick = false;
 
             // Show Game Completed Panel
             if (gameCompletedPanel != null)
                 gameCompletedPanel.SetActive(true);
+
+            int finalSeconds = Mathf.RoundToInt(totalRunTime);
+            LeaderboardManager.Instance.SubmitScore("memory_speedrun", finalSeconds);
+
 
             // Round and show current time
             if (currentTimeText != null)

@@ -328,6 +328,10 @@ public class NumberMemoryGameManager : MonoBehaviour
             if (gameCompletedPanel != null)
                 gameCompletedPanel.SetActive(true);
 
+            int finalSeconds = Mathf.RoundToInt(totalRunTime);
+            LeaderboardManager.Instance.SubmitScore("number_speedrun", finalSeconds);
+
+
             // Round and show current time
             if (currentTimeText != null)
                 currentTimeText.text = totalRunTime.ToString("F1") + "s";
