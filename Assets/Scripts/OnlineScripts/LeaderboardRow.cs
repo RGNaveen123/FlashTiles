@@ -1,14 +1,16 @@
-using TMPro;
 using UnityEngine;
+using TMPro;
 
 public class LeaderboardRow : MonoBehaviour
 {
+    public TMP_Text rankText;
     public TMP_Text playerNameText;
     public TMP_Text scoreText;
 
-    public void Set(string playerName, float timeSec)
+    public void Set(int rank, string playerName, float seconds)
     {
+        rankText.text = rank.ToString();
         playerNameText.text = playerName;
-        scoreText.text = $"{timeSec:F1}s";
+        scoreText.text = seconds.ToString("0.0") + "s";
     }
 }

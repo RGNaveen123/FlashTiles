@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Leaderboards;
+using Unity.Services.Leaderboards.Models;
 using UnityEngine;
 
 
 public class LeaderboardManager : MonoBehaviour
 {
+
     public static LeaderboardManager Instance { get; private set; }
 
     /* NEW: guard so we don’t re‑initialise */
@@ -39,6 +42,42 @@ public class LeaderboardManager : MonoBehaviour
     public Transform numberContent;                 // ← NumberContent
     public LeaderboardRow rowPrefab;                // ← the prefab you built
 
+    [Header("UI Controls")]
+    public TextMeshProUGUI leaderboardTitleText;
+    public TextMeshProUGUI toggleButtonText;
+    public GameObject togglebutton;
+
+    private bool showingMemoryBoard = true;
+
+    // Switching function from memory to number game
+
+    public void ToggleLeaderboard()
+    {
+        showingMemoryBoard = !showingMemoryBoard;
+        AudioManager.Instance.PlayButtonSound();
+        if (showingMemoryBoard)
+        {
+            numberContent.gameObject.SetActive(false);
+            memoryContent.gameObject.SetActive(true);
+
+            leaderboardTitleText.text = "Memory Leaderboard";
+            toggleButtonText.text = "Switch to Number Leaderboard";
+
+            _ = RefreshAndShow(memoryBoardId, memoryContent);
+        }
+        else
+        {
+            memoryContent.gameObject.SetActive(false);
+            numberContent.gameObject.SetActive(true);
+
+            leaderboardTitleText.text = "Number Leaderboard";
+            toggleButtonText.text = "Switch to Memory Leaderboard";
+
+            _ = RefreshAndShow(numberBoardId, numberContent);
+        }
+    }
+
+
     /* split the async logic out for clarity */
     private async Task InitialiseUGSAsync()
     {
@@ -57,9 +96,34 @@ public class LeaderboardManager : MonoBehaviour
     /* ========================================= */
 
     #region PUBLIC API
-    public void ShowMemory() => _ = RefreshAndShow(memoryBoardId, memoryContent);
-    public void ShowNumber() => _ = RefreshAndShow(numberBoardId, numberContent);
-    public void HidePage() => leaderboardPage.SetActive(false);
+    public void ShowMemory()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        numberContent.gameObject.SetActive(false);   // hide number leaderboard
+        memoryContent.gameObject.SetActive(true);    // show memory leaderboard
+        leaderboardPage.SetActive(true);
+
+        _ = RefreshAndShow(memoryBoardId, memoryContent);
+    }
+
+    public void ShowNumber()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        memoryContent.gameObject.SetActive(false);   // hide memory leaderboard
+        numberContent.gameObject.SetActive(true);    // show number leaderboard
+        leaderboardPage.SetActive(true);
+
+        _ = RefreshAndShow(numberBoardId, numberContent);
+    }
+
+    public void HidePage()
+    {
+        AudioManager.Instance.PlayButtonSound();
+        memoryContent.gameObject.SetActive(false);
+        numberContent.gameObject.SetActive(false);
+        leaderboardPage.SetActive(false);
+    }
+        
 
 
 
@@ -87,36 +151,62 @@ public class LeaderboardManager : MonoBehaviour
     }
     #endregion
 
-    /* -------- internals -------- */
     async Task RefreshAndShow(string boardId, Transform contentRoot)
     {
         leaderboardPage.SetActive(true);
-        Debug.Log("contentRoot = " + contentRoot.name);
 
-        // clear old rows
-        //foreach (Transform c in contentRoot) Destroy(c.gameObject);
-        for (int i = contentRoot.childCount - 1; i >= 0; i--)
+        // Clear previous entries
+        foreach (Transform child in contentRoot)
         {
-            Destroy(contentRoot.GetChild(i).gameObject);
+            Destroy(child.gameObject);
         }
 
-            try
+        try
         {
-            var resp = await LeaderboardsService.Instance.GetScoresAsync(
-                            boardId,
-                            new GetScoresOptions { Limit = 20 });
+            var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(
+                boardId,
+                new GetScoresOptions { Limit = 10 }  // Top 10
+            );
 
-            foreach (var entry in resp.Results)
+            var results = scoresResponse.Results;
+
+            for (int i = 0; i < results.Count; i++)
             {
+                var entry = results[i];
+
+                // Create a row instance
                 var row = Instantiate(rowPrefab, contentRoot);
-                row.Set(entry.PlayerName, (float)(entry.Score / 1000.0));
+
+                // Use entry.PlayerName (if set), fallback to PlayerId
+                string displayName = !string.IsNullOrEmpty(entry.PlayerName)
+                    ? entry.PlayerName
+                    : $"Player {entry.Rank}";
+
+                float seconds = (float)entry.Score;
+
+                // Set the row (with rank starting from 1)
+                row.Set(i + 1, displayName, seconds);
             }
         }
-        catch (System.Exception e)
+        catch (System.Exception ex)
         {
-            Debug.LogError($"LB fetch failed: {e}");
+            Debug.LogError("Leaderboard fetch failed: " + ex.Message);
         }
     }
+
+
+
+    // Development purpose Script
+
+    public void ResetBestTimes()
+    {
+        PlayerPrefs.DeleteKey("BestTime_Memory");
+        PlayerPrefs.DeleteKey("BestTime_Number");
+        PlayerPrefs.Save();
+
+        Debug.Log(" Best time scores have been reset.");
+    }
+
 
 
 }
