@@ -331,6 +331,11 @@ public class NumberMemoryGameManager : MonoBehaviour
             int finalSeconds = Mathf.RoundToInt(totalRunTime);
             LeaderboardManager.Instance.SubmitScore("number_speedrun", finalSeconds);
 
+            //Save the current time
+
+            PlayerPrefs.SetFloat("number-current", totalRunTime); // Save last run
+            PlayerPrefs.Save();
+
 
             // Round and show current time
             if (currentTimeText != null)

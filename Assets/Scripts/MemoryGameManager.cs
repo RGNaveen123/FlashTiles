@@ -266,6 +266,10 @@ public class MemoryGameManager : MonoBehaviour
             int finalSeconds = Mathf.RoundToInt(totalRunTime);
             LeaderboardManager.Instance.SubmitScore("memory_speedrun", finalSeconds);
 
+            //Save the current time
+            PlayerPrefs.SetFloat("memory-current", totalRunTime); // Save last run
+            PlayerPrefs.Save();
+
 
             // Round and show current time
             if (currentTimeText != null)

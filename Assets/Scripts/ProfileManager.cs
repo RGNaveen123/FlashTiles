@@ -2,7 +2,6 @@ using UnityEngine;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Leaderboards;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 public class ProfileManager : MonoBehaviour
@@ -19,50 +18,49 @@ public class ProfileManager : MonoBehaviour
 
     public GameObject editPanel, profilePanel;
 
-    void Start()
-    {
-        string currentName = AuthenticationService.Instance.PlayerName ?? PlayerPrefs.GetString("CachedPlayerName", "Guest");
-        txtName.text = $"Name: {currentName}";
-    }
-
-
-    void ShowTimes()
-    {
-        float memoryBest = PlayerPrefs.GetFloat("memory-best", -1);
-        float memoryCurrent = PlayerPrefs.GetFloat("memory-current", -1);
-        float numberBest = PlayerPrefs.GetFloat("number-best", -1);
-        float numberCurrent = PlayerPrefs.GetFloat("number-current", -1);
-
-        txtMemoryBest.text = memoryBest < 0 ? "--" : $"{memoryBest:0.0}s";
-        txtMemoryCurrent.text = memoryCurrent < 0 ? "--" : $"{memoryCurrent:0.0}s";
-        txtNumberBest.text = numberBest < 0 ? "--" : $"{numberBest:0.0}s";
-        txtNumberCurrent.text = numberCurrent < 0 ? "--" : $"{numberCurrent:0.0}s";
-    }
-
-
-
     public void ShowPanel()
     {
         AudioManager.Instance.PlayButtonSound();
         gameObject.SetActive(true);
+
         string currentName = AuthenticationService.Instance.PlayerName ?? PlayerPrefs.GetString("CachedPlayerName", "Guest");
         txtName.text = $"Name: {currentName}";
         inputName.text = currentName;
         txtError.gameObject.SetActive(false);
 
-        txtMemoryCurrent.text = PlayerPrefs.GetFloat("memory-current", -1) < 0 ? "--" : PlayerPrefs.GetFloat("memory-current").ToString("0.0s");
-        txtNumberCurrent.text = PlayerPrefs.GetFloat("number-current", -1) < 0 ? "--" : PlayerPrefs.GetFloat("number-current").ToString("0.0s");
+        // Show current times (local only)
+        float memCurrent = PlayerPrefs.GetFloat("memory-current", -1);
+        float numCurrent = PlayerPrefs.GetFloat("number-current", -1);
 
-        _ = FetchBest(memoryBoardId, txtMemoryBest);
-        _ = FetchBest(numberBoardId, txtNumberBest);
+        txtMemoryCurrent.text = memCurrent < 0 ? "--" : $"{Mathf.RoundToInt(memCurrent)}s";
+        txtNumberCurrent.text = numCurrent < 0 ? "--" : $"{Mathf.RoundToInt(numCurrent)}s";
+
+        // Show best times from leaderboard (fallback to local best)
+        _ = FetchBest(memoryBoardId, txtMemoryBest, "BestTime_Memory");
+        _ = FetchBest(numberBoardId, txtNumberBest, "BestTime_Number");
     }
 
-
-    public async Task FetchBest(string boardId, TMP_Text target)
+    public async Task FetchBest(string boardId, TMP_Text target, string fallbackKey)
     {
-        var resp = await LeaderboardsService.Instance.GetPlayerScoreAsync(boardId);
-        float best = (float)(resp?.Score ?? 0) / 1000f;
-        target.text = best.ToString("0.0s");
+        try
+        {
+            var resp = await LeaderboardsService.Instance.GetPlayerScoreAsync(boardId);
+            float best = resp != null ? (float)resp.Score : -1;
+            if (best > 0)
+                target.text = best.ToString("0.0") + "s";
+            else
+            {
+                // fallback to PlayerPrefs
+                float localBest = PlayerPrefs.GetFloat(fallbackKey, -1);
+                target.text = localBest > 0 ? $"{localBest:0.0}s" : "--";
+            }
+        }
+        catch
+        {
+            // Fallback on error
+            float localBest = PlayerPrefs.GetFloat(fallbackKey, -1);
+            target.text = localBest > 0 ? $"{localBest:0.0}s" : "--";
+        }
     }
 
     public void OnClickEdit()
@@ -75,14 +73,13 @@ public class ProfileManager : MonoBehaviour
     {
         AudioManager.Instance.PlayButtonSound();
         string newName = inputName.text.Trim();
-
         if (string.IsNullOrEmpty(newName))
         {
             ShowError("Name cannot be empty");
             return;
         }
 
-        // Check duplicate
+        // Check for duplicate
         var result = await LeaderboardsService.Instance.GetScoresAsync(memoryBoardId, new GetScoresOptions { Limit = 100 });
         foreach (var entry in result.Results)
         {
@@ -110,34 +107,11 @@ public class ProfileManager : MonoBehaviour
         profilePanel.SetActive(true);
     }
 
-
     void ShowError(string message)
     {
         txtError.text = message;
         txtError.color = Color.red;
     }
-
-    async Task CheckDuplicateAndSave(string newName)
-    {
-        var result = await LeaderboardsService.Instance.GetScoresAsync(memoryBoardId, new GetScoresOptions { Limit = 100 });
-        foreach (var entry in result.Results)
-        {
-            if (entry.PlayerName == newName)
-            {
-                ShowError("Name already taken.");
-                return;
-            }
-        }
-
-        // Save
-        PlayerPrefs.SetString("playerName", newName);
-        PlayerPrefs.Save();
-        txtName.text = newName;
-        inputName.gameObject.SetActive(false);
-        Debug.Log("Name updated successfully");
-    }
-
-    //Back button
 
     public void OnClickBackFromEdit()
     {
@@ -150,8 +124,6 @@ public class ProfileManager : MonoBehaviour
     {
         AudioManager.Instance.PlayButtonSound();
         gameObject.SetActive(false);
-        // Add logic to show main menu if needed
     }
-
-
 }
+
